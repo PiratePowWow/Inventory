@@ -7,23 +7,34 @@ import java.util.Scanner;
  */
 public class Main {
     private static Scanner scanner = new Scanner((System.in));
-
+    static HashMap<String, User> users = new HashMap<>();
 
 
     public static void main(String[] args) throws CategoryException {
-        HashMap<String, String> users = new HashMap<>();
-        users.put("Bob", "Smith");
-        users.put("Alice", "Smith");
-        users.put("Charlie", "Work");
-        ArrayList<Item> inventory = new ArrayList<>();
+//        HashMap<String, String> users = new HashMap<>();
+//        users.put("Bob", "Smith");
+//        users.put("Alice", "Smith");
+//        users.put("Charlie", "Work");
+//        ArrayList<Item> inventory = new ArrayList<>();
 
-        login(users);
+        users.put("Bob",new User("Bob", "Smith"));
+        users.put("Alice",new User("Alice", "Smith"));
+        users.put("Charlie",new User("Charlie", "Work"));
 
 
-        while (true) {
+        String name = login();
+        selection(name);
 
 
-            for (Item item : inventory){
+
+    }
+
+    public static void selection(String name) throws CategoryException {
+
+        while (name != null) {
+
+
+            for (Item item : users.get(name).inventory){
                 System.out.printf("%s: %s [%d]\n", item.category, item.item, item.quantity);
             }
 
@@ -31,6 +42,7 @@ public class Main {
             System.out.println("1. Add a new item to your inventory");
             System.out.println("2. Remove an item from your inventory");
             System.out.println("3. Update an item's quantity");
+            System.out.println("4. Change User");
 
             String selection = scanner.nextLine();
             switch  (selection){
@@ -41,15 +53,16 @@ public class Main {
                     int quantity = Integer.valueOf(scanner.nextLine());
                     System.out.println("What category is the item?");
                     String category = scanner.nextLine();
-                    inventory.add(createItem(item, quantity, category));
+                    users.get(name).inventory.add(createItem(item, quantity, category));
                     System.out.println("Item added. Returning to main menu.");
                     break;
                 case ("2"):
                     System.out.println("What item would you like to remove?:");
                     item = scanner.nextLine();
-                    for (Item i: inventory){
+                    for (Item i: users.get(name).inventory){
                         if (i.item.equalsIgnoreCase(item)){
-                            inventory.remove(i);
+                            users.get(name).inventory.remove(i);
+                            break;
                         }
                     }
                     System.out.println("That item has been removed. Returning to main menu.");
@@ -59,36 +72,41 @@ public class Main {
                     item = scanner.nextLine();
                     System.out.printf("What is the new quantity for your %s?:\n", item);
                     quantity = Integer.valueOf(scanner.nextLine());
-                    for (Item i: inventory){
+                    for (Item i: users.get(name).inventory){
                         if (i.item.equalsIgnoreCase(item)){
                             i.quantity = quantity;
+                            break;
                         }
                     }
                     System.out.println("Item quantity has been updated. Returning to main menu.");
 
                     break;
+                case ("4"):
+                    selection(login());
                 default:
                     System.out.println("Invalid selection");
                     break;
             }
 
         }
-
+        selection(login());
     }
-    public static void login(HashMap<String, String> users) {
+
+    public static String login() {
         System.out.printf("Please enter login credentials\n Name: ");
         String name = scanner.nextLine();
         System.out.printf("Password: ");
         String password = scanner.nextLine();
-        if (users.get(name).equals(password)) {
-            System.out.printf("Listing %s's inventory:", name);
+        if ((users.containsKey(name)) && (users.get(name).password.equals(password))) {
+            System.out.printf("Listing %s's inventory:\n", name);
+            return name;
 
         }
         else {
             System.out.println("Login credentials not recognized.");
-            login(users);
+            login();
         }
-
+        return null;
     }
 
     public static Item createItem(String name, int quantity, String category) throws CategoryException {
