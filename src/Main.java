@@ -104,9 +104,9 @@ public class Main {
         }
         else {
             System.out.println("Login credentials not recognized.");
-            login();
+            name = login();//Just putting login(); and not having it return name goes into a tricky recursion loop
+            return name;
         }
-        return null;
     }
 
     public static Item createItem(String name, int quantity, String category) throws CategoryException {
